@@ -17,7 +17,7 @@ const UserDashboard: React.FC = () => {
         getLabBookings()
       ]);
       
-      // For demo purposes, we'll show more items to ensure the dashboard isn't empty
+      
       // In a real app, this would filter by the logged-in user's ID
       setMyMaintenance(mRequests); 
       setMyLostFound(lfItems);
