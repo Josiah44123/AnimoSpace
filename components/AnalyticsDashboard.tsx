@@ -23,7 +23,7 @@ const AnalyticsDashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  // Calculate Maintenance Stats
+  // Calculate Stats
   const pendingMaintenance = maintenanceData.filter(r => r.status === 'pending').length;
   const inProgressMaintenance = maintenanceData.filter(r => r.status === 'in-progress').length;
   const resolvedMaintenance = maintenanceData.filter(r => r.status === 'resolved').length;
