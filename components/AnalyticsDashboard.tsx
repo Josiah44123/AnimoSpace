@@ -19,7 +19,7 @@ const AnalyticsDashboard: React.FC = () => {
       setLostFoundData(lfItems);
       setLoading(false);
     };
-
+// Simulate loading delay
     fetchData();
   }, []);
 
