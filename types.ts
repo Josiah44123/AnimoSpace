@@ -79,3 +79,42 @@ export interface FloorData {
   floorNumber: number;
   rooms: Room[];
 }
+
+// Equipment Management Types
+export interface Equipment {
+  id: string;
+  name: string;
+  quantity: number;
+  category: 'Chemistry' | 'Physics' | 'Biology' | 'General' | 'Computing';
+  condition: 'good' | 'damaged' | 'lost';
+  lastCheckedBy?: string;
+  lastCheckedDate?: Date;
+}
+
+export interface BorrowingSlip {
+  id: string;
+  studentId: string;
+  studentName: string;
+  equipmentId: string;
+  equipmentName: string;
+  quantity: number;
+  borrowDate: Date;
+  expectedReturnDate?: Date;
+  actualReturnDate?: Date;
+  status: 'borrowed' | 'returned' | 'pending-return' | 'damaged' | 'lost';
+  damageReport?: string;
+  borrowType: 'in-class' | 'multi-day' | 'out-of-class';
+}
+
+export interface EquipmentRequisition {
+  id: string;
+  submittedBy: string;
+  professorEmail: string;
+  sectionName: string;
+  labDate: string;
+  equipmentList: Array<{ equipmentId: string; equipmentName: string; quantityNeeded: number }>;
+  status: 'pending' | 'approved' | 'rejected' | 'prepared';
+  preparedBy?: string;
+  submittedDate: Date;
+  notes?: string;
+}

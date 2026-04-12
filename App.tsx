@@ -8,6 +8,7 @@ import MaintenanceRequests from './components/MaintenanceRequests';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import UserDashboard from './components/UserDashboard';
 import LabBookingComponent from './components/LabBooking';
+import EquipmentManagement from './components/EquipmentManagement';
 import LandingPage from './components/LandingPage';
 import LoginScreen from './components/LoginScreen';
 import { FloorData, Room, UserRole, AuditLog } from './types';
@@ -17,7 +18,7 @@ import { Bell, Search, History, Activity, Menu, LogOut } from 'lucide-react';
 const App: React.FC = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'lab-facilities'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'lab-facilities' | 'equipment'>('dashboard');
   const [currentFloor, setCurrentFloor] = useState<number>(1);
   const [floors, setFloors] = useState<FloorData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -264,6 +265,8 @@ const App: React.FC = () => {
             <UserDashboard />
         ) : currentView === 'lab-facilities' ? (
             <LabBookingComponent userRole={userRole} />
+        ) : currentView === 'equipment' ? (
+            <EquipmentManagement userRole={userRole} />
         ) : (
             <AnalyticsDashboard />
         )}

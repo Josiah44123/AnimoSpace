@@ -1,4 +1,4 @@
-import { Room, ClassSchedule, RoomStatus, AuditLog, MaintenanceRequest, LostItem, EnvironmentalData, LabBooking } from '../types';
+import { Room, ClassSchedule, RoomStatus, AuditLog, MaintenanceRequest, LostItem, EnvironmentalData, LabBooking, Equipment, BorrowingSlip, EquipmentRequisition } from '../types';
 import { INITIAL_FLOORS, INITIAL_SCHEDULES } from './mockData';
 
 // Simulating a backend store in memory
@@ -70,6 +70,46 @@ let labBookingsStore: LabBooking[] = [
         purpose: 'Chemistry Experiment',
         status: 'pending',
         requestDate: new Date()
+    }
+];
+
+// Equipment Management Stores
+let equipmentStore: Equipment[] = [
+    { id: '1', name: 'Beaker (500ml)', quantity: 20, category: 'Chemistry', condition: 'good' },
+    { id: '2', name: 'Test Tubes', quantity: 100, category: 'Chemistry', condition: 'good' },
+    { id: '3', name: 'Microscope', quantity: 5, category: 'Biology', condition: 'good' },
+    { id: '4', name: 'Bunsen Burner', quantity: 8, category: 'Chemistry', condition: 'good' },
+    { id: '5', name: 'Power Supply Unit', quantity: 12, category: 'Physics', condition: 'good' },
+];
+
+let borrowingSlipsStore: BorrowingSlip[] = [
+    {
+        id: '1',
+        studentId: '2023001',
+        studentName: 'Maria Santos',
+        equipmentId: '1',
+        equipmentName: 'Beaker (500ml)',
+        quantity: 2,
+        borrowDate: new Date(),
+        expectedReturnDate: new Date(Date.now() + 86400000),
+        status: 'borrowed',
+        borrowType: 'in-class'
+    }
+];
+
+let requisitionsStore: EquipmentRequisition[] = [
+    {
+        id: '1',
+        submittedBy: 'Dr. Juan Dela Cruz',
+        professorEmail: 'juan.delacruz@dlsl.edu.ph',
+        sectionName: 'Chemistry 101 - Section A',
+        labDate: new Date(Date.now() + 172800000).toISOString().split('T')[0],
+        equipmentList: [
+            { equipmentId: '1', equipmentName: 'Beaker (500ml)', quantityNeeded: 30 },
+            { equipmentId: '4', equipmentName: 'Bunsen Burner', quantityNeeded: 8 }
+        ],
+        status: 'pending',
+        submittedDate: new Date()
     }
 ];
 
@@ -299,4 +339,98 @@ export const calculateRoomStatus = (room: Room, schedules: ClassSchedule[]): Roo
     computedStatus: 'free',
     currentClass: null
   };
+};
+
+// ==================== EQUIPMENT MANAGEMENT ====================
+
+// Get all equipment
+export const getEquipment = async (): Promise<Equipment[]> => {
+    return new Promise<Equipment[]>((resolve) => {
+        setTimeout(() => resolve([...equipmentStore]), 200);
+    });
+};
+
+// Get borrowing slips (all or filtered by student)
+export const getBorrowingSlips = async (studentId?: string): Promise<BorrowingSlip[]> => {
+    return new Promise<BorrowingSlip[]>((resolve) => {
+        const slips = studentId 
+            ? borrowingSlipsStore.filter(s => s.studentId === studentId)
+            : borrowingSlipsStore;
+        setTimeout(() => resolve([...slips]), 200);
+    });
+};
+
+// Create a new borrowing slip (in-class borrowing)
+export const createBorrowingSlip = async (slip: Omit<BorrowingSlip, 'id'>) => {
+    return new Promise<void>((resolve) => {
+        const newSlip: BorrowingSlip = {
+            ...slip,
+            id: Date.now().toString()
+        };
+        borrowingSlipsStore.unshift(newSlip);
+        setTimeout(() => resolve(), 200);
+    });
+};
+
+// Update borrowing slip status (return, damage, etc)
+export const updateBorrowingSlipStatus = async (id: string, status: BorrowingSlip['status'], damageReport?: string) => {
+    return new Promise<void>((resolve) => {
+        borrowingSlipsStore = borrowingSlipsStore.map(slip =>
+            slip.id === id 
+                ? { ...slip, status, actualReturnDate: status === 'returned' ? new Date() : slip.actualReturnDate, damageReport }
+                : slip
+        );
+        setTimeout(() => resolve(), 200);
+    });
+};
+
+// Submit equipment requisition (advance requisition for experiments)
+export const submitEquipmentRequisition = async (req: Omit<EquipmentRequisition, 'id' | 'submittedDate'>) => {
+    return new Promise<void>((resolve) => {
+        const newReq: EquipmentRequisition = {
+            ...req,
+            id: Date.now().toString(),
+            submittedDate: new Date()
+        };
+        requisitionsStore.unshift(newReq);
+        setTimeout(() => resolve(), 200);
+    });
+};
+
+// Get pending requisitions
+export const getEquipmentRequisitions = async (status?: EquipmentRequisition['status']): Promise<EquipmentRequisition[]> => {
+    return new Promise<EquipmentRequisition[]>((resolve) => {
+        const reqs = status 
+            ? requisitionsStore.filter(r => r.status === status)
+            : requisitionsStore;
+        setTimeout(() => resolve([...reqs]), 200);
+    });
+};
+
+// Update requisition status (approve, prepare, etc)
+export const updateRequisitionStatus = async (id: string, status: EquipmentRequisition['status'], preparedBy?: string) => {
+    return new Promise<void>((resolve) => {
+        requisitionsStore = requisitionsStore.map(req =>
+            req.id === id 
+                ? { ...req, status, preparedBy: status === 'prepared' ? preparedBy : req.preparedBy }
+                : req
+        );
+        setTimeout(() => resolve(), 200);
+    });
+};
+
+// Check pending returns (equipment that should be returned)
+export const getPendingReturns = async (): Promise<BorrowingSlip[]> => {
+    return new Promise<BorrowingSlip[]>((resolve) => {
+        const pending = borrowingSlipsStore.filter(s => s.status === 'pending-return' || s.status === 'borrowed');
+        setTimeout(() => resolve([...pending]), 200);
+    });
+};
+
+// Get damaged/lost items for accountability
+export const getDamagedOrLostEquipment = async (): Promise<BorrowingSlip[]> => {
+    return new Promise<BorrowingSlip[]>((resolve) => {
+        const items = borrowingSlipsStore.filter(s => s.status === 'damaged' || s.status === 'lost');
+        setTimeout(() => resolve([...items]), 200);
+    });
 };
