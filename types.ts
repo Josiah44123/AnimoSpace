@@ -61,7 +61,7 @@ export interface EnvironmentalData {
   timestamp: Date;
 }
 
-export type UserRole = 'user' | 'admin' | 'maintenance';
+export type UserRole = 'user' | 'admin' | 'maintenance' | 'lab-officer' | 'sdfo';
 
 export interface LabBooking {
   id: string;

@@ -38,9 +38,9 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className={`w-64 bg-white h-screen border-r border-gray-200 flex flex-col shadow-sm fixed left-0 top-0 z-30 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
         {/* Header */}
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-          <div className="flex items-center gap-2 text-green-800">
+          <div className="flex items-center gap-2 text-green-800 flex-1">
               <Building className="w-8 h-8" />
-              <div>
+              <div className="flex-1">
                   <h1 className="text-xl font-bold leading-tight tracking-tight">Animo<span className="text-green-600">Space</span></h1>
                   <p className="text-xs text-gray-500 font-medium">Mabini Building</p>
               </div>
@@ -48,6 +48,20 @@ const Sidebar: React.FC<SidebarProps> = ({
           <button className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg" onClick={onClose}>
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* User Role Badge */}
+        <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
+          <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Current Role</p>
+          <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
+            <div className="w-2 h-2 rounded-full bg-green-600"></div>
+            <span className="text-sm font-semibold text-green-700 capitalize">
+              {userRole === 'lab-officer' ? 'Lab Officer' : 
+               userRole === 'sdfo' ? 'SDFO' : 
+               userRole === 'user' ? 'Student/Faculty' : 
+               userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+            </span>
+          </div>
         </div>
 
       {/* Navigation */}
