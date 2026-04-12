@@ -11,7 +11,7 @@ import UserDashboard from './components/UserDashboard';
 import EquipmentManagement from './components/EquipmentManagement';
 import LandingPage from './components/LandingPage';
 import LoginScreen from './components/LoginScreen';
-import { FloorData, Room, UserRole, AuditLog } from './types';
+import { FloorData, Room, UserRole, AuditLog, UserProfile } from './types';
 import { getFloors, getSchedulesByRoom, calculateRoomStatus, updateRoomOverride, getAuditLogs } from './services/spaceSyncService';
 import { Bell, Search, History, Activity, Menu, LogOut } from 'lucide-react';
 
@@ -28,6 +28,7 @@ const App: React.FC = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   // Manage Body Background Color
   useEffect(() => {
@@ -102,8 +103,11 @@ const App: React.FC = () => {
   if (showLogin) {
       return (
         <LoginScreen 
-            onLogin={(role) => {
+            onLogin={(role, profile) => {
                 setUserRole(role);
+                if (profile) {
+                    setUserProfile(profile);
+                }
                 setShowLogin(false);
                 if (role === 'user') {
                     setCurrentView('my-activity');

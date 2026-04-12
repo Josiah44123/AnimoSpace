@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, MapPin, Tag, Plus, CheckCircle, Clock, Mail, AlertCircle } from 'lucide-react';
+import { Search, MapPin, Tag, Plus, CheckCircle, Clock, Mail, AlertCircle, Upload, Image } from 'lucide-react';
 import { LostItem, UserRole } from '../types';
 import { getLostAndFoundItems, reportLostItem, resolveLostItem, checkSimilarItems, sendEmailNotification } from '../services/spaceSyncService';
 
@@ -22,6 +22,7 @@ const LostAndFound: React.FC<LostAndFoundProps> = ({ userRole }) => {
   const [location, setLocation] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchItems();
@@ -97,7 +98,19 @@ const LostAndFound: React.FC<LostAndFoundProps> = ({ userRole }) => {
     setLocation('');
     setContact('');
     setEmail('');
-  }
+    setPhotoUrl(null);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const filteredItems = items.filter(item => {
       if (filter === 'all') return true;
@@ -206,7 +219,15 @@ const LostAndFound: React.FC<LostAndFoundProps> = ({ userRole }) => {
       ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredItems.map(item => (
-                  <div key={item.id} className={`bg-white rounded-xl shadow-sm border p-5 flex flex-col h-full ${item.status === 'resolved' ? 'opacity-60 border-gray-200' : 'border-gray-100'}`}>
+                  <div key={item.id} className={`bg-white rounded-xl shadow-sm border flex flex-col h-full overflow-hidden ${item.status === 'resolved' ? 'opacity-60 border-gray-200' : 'border-gray-100'}`}>
+                      {item.photoUrl ? (
+                          <img src={item.photoUrl} alt={item.itemName} className="w-full h-48 object-cover" />
+                      ) : (
+                          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                              <Image className="w-8 h-8 text-gray-300" />
+                          </div>
+                      )}
+                      <div className="p-5 flex flex-col h-full">
                       <div className="flex justify-between items-start mb-3">
                           <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide ${
                               item.type === 'lost' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
@@ -251,6 +272,7 @@ const LostAndFound: React.FC<LostAndFoundProps> = ({ userRole }) => {
                               Mark as Resolved
                           </button>
                       )}
+                      </div>
                   </div>
               ))}
           </div>
@@ -315,6 +337,32 @@ const LostAndFound: React.FC<LostAndFoundProps> = ({ userRole }) => {
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                           />
+                      </div>
+
+                      <div>
+                          <label className="block text-xs font-semibold text-gray-700 mb-2">Photo (Optional)</label>
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-indigo-500 transition-colors cursor-pointer">
+                              <input 
+                                  type="file" 
+                                  accept="image/*"
+                                  onChange={handlePhotoUpload}
+                                  className="hidden"
+                                  id="photo-upload"
+                              />
+                              <label htmlFor="photo-upload" className="cursor-pointer flex flex-col items-center gap-2">
+                                  {photoUrl ? (
+                                      <>
+                                          <img src={photoUrl} alt="preview" className="w-24 h-24 object-cover rounded" />
+                                          <span className="text-xs text-indigo-600 font-medium">Change Photo</span>
+                                      </>
+                                  ) : (
+                                      <>
+                                          <Upload className="w-5 h-5 text-gray-400" />
+                                          <span className="text-xs text-gray-600">Click to upload a photo of the item</span>
+                                      </>
+                                  )}
+                              </label>
+                          </div>
                       </div>
 
                       <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors mt-4">

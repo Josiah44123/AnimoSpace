@@ -41,6 +41,13 @@ export interface MaintenanceRequest {
   reportedBy: string;
 }
 
+export interface UserProfile {
+  studentNumber: string;
+  email?: string;
+  userRole: UserRole;
+  createdAt: Date;
+}
+
 export interface LostItem {
   id: string;
   type: 'lost' | 'found';
@@ -48,8 +55,11 @@ export interface LostItem {
   description: string;
   location: string;
   contactInfo: string;
+  email?: string;
+  photoUrl?: string;
   status: 'open' | 'resolved';
   date: Date;
+  reportedBy?: string;
 }
 
 export interface EnvironmentalData {

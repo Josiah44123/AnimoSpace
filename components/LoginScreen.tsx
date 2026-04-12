@@ -1,33 +1,49 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Wrench, ShieldCheck, ArrowRight, Lock, Users, Key } from 'lucide-react';
-import { UserRole } from '../types';
+import { UserRole, UserProfile } from '../types';
 
 interface LoginScreenProps {
-  onLogin: (role: UserRole) => void;
+  onLogin: (role: UserRole, profile?: UserProfile) => void;
   onBack: () => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [password, setPassword] = useState('');
+  const [studentNumber, setStudentNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
     setError('');
     setPassword('');
-    
-    // If user role, login immediately
-    if (role === 'user') {
-      onLogin('user');
-    }
+    setStudentNumber('');
+    setEmail('');
   };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRole) return;
 
+    // Student login - requires student number
+    if (selectedRole === 'user') {
+      if (!studentNumber.trim()) {
+        setError('Please enter your student number');
+        return;
+      }
+      const profile: UserProfile = {
+        studentNumber: studentNumber.trim(),
+        email: email.trim() || undefined,
+        userRole: 'user',
+        createdAt: new Date()
+      };
+      onLogin('user', profile);
+      return;
+    }
+
+    // Admin/Staff login - requires password
     const passwords: Record<Exclude<UserRole, 'user'>, string> = {
       admin: 'admin123',
       maintenance: 'maint123',
@@ -35,7 +51,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
       sdfo: 'sdfo123'
     };
 
-    if (selectedRole !== 'user' && password === passwords[selectedRole]) {
+    if (password === passwords[selectedRole]) {
       onLogin(selectedRole);
     } else {
       setError(`Invalid ${selectedRole} password`);
@@ -141,6 +157,67 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
             })}
           </div>
         ) : null}
+
+        {/* Student Form */}
+        {selectedRole === 'user' && (
+          <motion.form 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onSubmit={handleLogin}
+            className="mt-8 space-y-6"
+          >
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 bg-green-50">
+                <User className="w-8 h-8 text-green-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">Student / Faculty Login</h3>
+              <p className="text-gray-600 mt-1">Enter your student number to continue</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Student Number *</label>
+                <input
+                  type="text"
+                  value={studentNumber}
+                  onChange={(e) => setStudentNumber(e.target.value)}
+                  placeholder="e.g., 2024-001234"
+                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email (Optional)</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your.email@dlsl.edu.ph"
+                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedRole(null)}
+                className="flex-1 py-3 px-4 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                className="flex-1 py-3 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors shadow-md hover:shadow-lg"
+              >
+                Login
+              </button>
+            </div>
+          </motion.form>
+        )}
 
         {/* Password Input for Protected Roles */}
         {selectedRole && selectedRole !== 'user' && (

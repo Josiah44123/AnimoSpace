@@ -118,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               }`}
             >
               <Package className="w-5 h-5" />
-              <span>Equipment Mgmt</span>
+              <span>Lab Equipment</span>
             </button>
 
             <button
