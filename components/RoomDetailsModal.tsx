@@ -9,9 +9,10 @@ interface RoomDetailsModalProps {
   onClose: () => void;
   userRole: UserRole;
   onStatusChange: (roomId: string, status: RoomStatus | null) => void;
+  floorViewMode?: 'room-booking' | 'maintenance' | 'lost-found';
 }
 
-const RoomDetailsModal: React.FC<RoomDetailsModalProps> = ({ room, onClose, userRole, onStatusChange }) => {
+const RoomDetailsModal: React.FC<RoomDetailsModalProps> = ({ room, onClose, userRole, onStatusChange, floorViewMode = 'room-booking' }) => {
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
   const [maintenanceRequests, setMaintenanceRequests] = useState<MaintenanceRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,9 +90,21 @@ const RoomDetailsModal: React.FC<RoomDetailsModalProps> = ({ room, onClose, user
           </button>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs - Context-aware based on floor view mode */}
         <div className="flex border-b border-gray-200">
-            {['info', 'schedule', 'maintenance'].map((tab) => (
+            {(() => {
+              let tabs: string[] = [];
+              if (floorViewMode === 'room-booking') {
+                tabs = ['info', 'schedule'];
+              } else if (floorViewMode === 'maintenance') {
+                tabs = ['info', 'maintenance'];
+              } else if (floorViewMode === 'lost-found') {
+                tabs = ['info'];
+              }
+              // Always include for admin
+              if (userRole === 'admin' && !tabs.includes('maintenance')) tabs.push('maintenance');
+              
+              return tabs.map((tab) => (
                 <button 
                     key={tab}
                     onClick={() => setActiveTab(tab as any)}
@@ -99,7 +112,8 @@ const RoomDetailsModal: React.FC<RoomDetailsModalProps> = ({ room, onClose, user
                 >
                     {tab}
                 </button>
-            ))}
+              ));
+            })()}
         </div>
 
         {/* Content */}

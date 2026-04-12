@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Sidebar from './components/Sidebar';
-import FloorPlan from './components/FloorPlan';
+import FloorView from './components/FloorView';
 import RoomDetailsModal from './components/RoomDetailsModal';
 import LostAndFound from './components/LostAndFound';
 import MaintenanceRequests from './components/MaintenanceRequests';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import UserDashboard from './components/UserDashboard';
-import LabBookingComponent from './components/LabBooking';
+
 import EquipmentManagement from './components/EquipmentManagement';
 import LandingPage from './components/LandingPage';
 import LoginScreen from './components/LoginScreen';
@@ -18,7 +18,8 @@ import { Bell, Search, History, Activity, Menu, LogOut } from 'lucide-react';
 const App: React.FC = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'lab-facilities' | 'equipment'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'equipment'>('dashboard');
+  const [floorViewMode, setFloorViewMode] = useState<'room-booking' | 'maintenance' | 'lost-found'>('room-booking');
   const [currentFloor, setCurrentFloor] = useState<number>(1);
   const [floors, setFloors] = useState<FloorData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -245,17 +246,16 @@ const App: React.FC = () => {
                    <p>Syncing digital twin data...</p>
                 </div>
              ) : (
-               <>
-                  {currentFloorData ? (
-                      <FloorPlan 
-                         floorNumber={currentFloor} 
-                         rooms={currentFloorData.rooms} 
-                         onRoomClick={handleRoomClick}
-                      />
-                  ) : (
-                      <div>Floor data not found</div>
-                  )}
-               </>
+               <FloorView 
+                 currentFloor={currentFloor}
+                 onFloorChange={setCurrentFloor}
+                 floors={floors}
+                 selectedRoom={selectedRoom}
+                 onRoomClick={handleRoomClick}
+                 userRole={userRole}
+                 viewMode={floorViewMode}
+                 onViewModeChange={setFloorViewMode}
+               />
              )
         ) : currentView === 'lost-found' ? (
             <LostAndFound userRole={userRole} />
@@ -263,8 +263,6 @@ const App: React.FC = () => {
             <MaintenanceRequests userRole={userRole} />
         ) : currentView === 'my-activity' ? (
             <UserDashboard />
-        ) : currentView === 'lab-facilities' ? (
-            <LabBookingComponent userRole={userRole} />
         ) : currentView === 'equipment' ? (
             <EquipmentManagement userRole={userRole} />
         ) : (
@@ -278,6 +276,7 @@ const App: React.FC = () => {
                 onClose={() => setSelectedRoom(null)}
                 userRole={userRole}
                 onStatusChange={handleStatusChange}
+                floorViewMode={floorViewMode}
             />
         )}
       </div>

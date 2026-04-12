@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, User, Shield, Building, Search, LayoutGrid, Wrench, Activity, HardHat, ClipboardList, Beaker, Package, X } from 'lucide-react';
+import { Layers, User, Shield, Building, Search, LayoutGrid, Wrench, Activity, HardHat, ClipboardList, Package, X } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface SidebarProps {
@@ -7,8 +7,8 @@ interface SidebarProps {
   onFloorChange: (floor: number) => void;
   userRole: UserRole;
   onRoleChange: (role: UserRole) => void;
-  currentView: 'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'lab-facilities' | 'equipment';
-  onViewChange: (view: 'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'lab-facilities' | 'equipment') => void;
+  currentView: 'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'equipment';
+  onViewChange: (view: 'dashboard' | 'lost-found' | 'maintenance' | 'analytics' | 'my-activity' | 'equipment') => void;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -108,18 +108,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <span>My Activity</span>
                 </button>
             )}
-
-            <button
-              onClick={() => onViewChange('lab-facilities')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                currentView === 'lab-facilities'
-                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Beaker className="w-5 h-5" />
-              <span>Lab Facilities</span>
-            </button>
 
             <button
               onClick={() => onViewChange('equipment')}
