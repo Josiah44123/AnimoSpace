@@ -7,7 +7,7 @@ interface LoginScreenProps {
   onLogin: (role: UserRole) => void;
   onBack: () => void;
 }
-
+// LoginScreen component with role selection and password input for admin/maintenance
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [password, setPassword] = useState('');
