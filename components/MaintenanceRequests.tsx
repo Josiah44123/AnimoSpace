@@ -6,7 +6,7 @@ import { getMaintenanceRequests, reportMaintenanceIssue, updateMaintenanceStatus
 interface MaintenanceRequestsProps {
   userRole: UserRole;
 }
-
+// MaintenanceRequests component to display and manage maintenance requests
 const MaintenanceRequests: React.FC<MaintenanceRequestsProps> = ({ userRole }) => {
   const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
   const [loading, setLoading] = useState(true);
