@@ -27,10 +27,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
     e.preventDefault();
     if (!selectedRole) return;
 
-    // Student login - requires student number
+    // Student login - requires student number (10 digits)
     if (selectedRole === 'user') {
       if (!studentNumber.trim()) {
         setError('Please enter your student number');
+        return;
+      }
+      // Regex: exactly 10 digits
+      const studentNumberRegex = /^\d{10}$/;
+      if (!studentNumberRegex.test(studentNumber.trim())) {
+        setError('Student number must be exactly 10 digits');
         return;
       }
       const profile: UserProfile = {
@@ -180,8 +186,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
                 <input
                   type="text"
                   value={studentNumber}
-                  onChange={(e) => setStudentNumber(e.target.value)}
-                  placeholder="e.g., 2024-001234"
+                  onChange={(e) => setStudentNumber(e.target.value.replace(/\D/g, ''))}
+                  placeholder="e.g., 2024001234 (10 digits)"
+                  maxLength={10}
                   className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   autoFocus
                 />

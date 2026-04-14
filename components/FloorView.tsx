@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Home, Wrench, Search } from 'lucide-react';
 import FloorPlan from './FloorPlan';
-import { FloorData, Room, UserRole, RoomStatus } from '../types';
+import { FloorData, Room, UserRole, RoomStatus, MaintenanceRequest } from '../types';
 
 interface FloorViewProps {
   currentFloor: number;
@@ -13,6 +13,7 @@ interface FloorViewProps {
   userRole: UserRole;
   viewMode: 'room-booking' | 'maintenance' | 'lost-found';
   onViewModeChange: (mode: 'room-booking' | 'maintenance' | 'lost-found') => void;
+  maintenanceRequests?: MaintenanceRequest[];
 }
 
 const FloorView: React.FC<FloorViewProps> = ({
@@ -24,6 +25,7 @@ const FloorView: React.FC<FloorViewProps> = ({
   userRole,
   viewMode,
   onViewModeChange,
+  maintenanceRequests = [],
 }) => {
   const currentFloorData = floors.find(f => f.floorNumber === currentFloor);
 
@@ -50,26 +52,6 @@ const FloorView: React.FC<FloorViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Floor Selector */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">Select Floor</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1, 2, 3, 4].map(floor => (
-            <button
-              key={floor}
-              onClick={() => onFloorChange(floor)}
-              className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-                currentFloor === floor
-                  ? 'bg-green-600 text-white shadow-md ring-2 ring-green-200'
-                  : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
-              }`}
-            >
-              Level {floor}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* View Mode Tabs */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">View Mode</h3>
@@ -126,6 +108,7 @@ const FloorView: React.FC<FloorViewProps> = ({
             selectedRoom={selectedRoom}
             viewMode={viewMode}
             userRole={userRole}
+            maintenanceRequests={maintenanceRequests}
           />
         ) : (
           <div className="flex items-center justify-center h-64 text-gray-400">

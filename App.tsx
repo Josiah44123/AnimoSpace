@@ -11,8 +11,8 @@ import UserDashboard from './components/UserDashboard';
 import EquipmentManagement from './components/EquipmentManagement';
 import LandingPage from './components/LandingPage';
 import LoginScreen from './components/LoginScreen';
-import { FloorData, Room, UserRole, AuditLog, UserProfile } from './types';
-import { getFloors, getSchedulesByRoom, calculateRoomStatus, updateRoomOverride, getAuditLogs } from './services/spaceSyncService';
+import { FloorData, Room, UserRole, AuditLog, UserProfile, MaintenanceRequest } from './types';
+import { getFloors, getSchedulesByRoom, calculateRoomStatus, updateRoomOverride, getAuditLogs, getMaintenanceRequests } from './services/spaceSyncService';
 import { Bell, Search, History, Activity, Menu, LogOut } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -29,6 +29,7 @@ const App: React.FC = () => {
   const [showLogs, setShowLogs] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [maintenanceRequests, setMaintenanceRequests] = useState<MaintenanceRequest[]>([]);
 
   // Manage Body Background Color
   useEffect(() => {
@@ -54,6 +55,7 @@ const App: React.FC = () => {
     if (floors.length === 0) setLoading(true);
     
     const floorsData = await getFloors();
+    const maintenanceData = await getMaintenanceRequests();
     
     // Process each room to calculate computed status based on schedules
     // In a real app, this might happen on the backend or more efficiently
@@ -66,6 +68,7 @@ const App: React.FC = () => {
     }));
 
     setFloors(processedFloors);
+    setMaintenanceRequests(maintenanceData);
     setLoading(false);
   };
 
@@ -259,6 +262,7 @@ const App: React.FC = () => {
                  userRole={userRole}
                  viewMode={floorViewMode}
                  onViewModeChange={setFloorViewMode}
+                 maintenanceRequests={maintenanceRequests}
                />
              )
         ) : currentView === 'lost-found' ? (

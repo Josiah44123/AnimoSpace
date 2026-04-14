@@ -33,6 +33,8 @@ let lostAndFoundStore: LostItem[] = [
     description: 'Found under a chair near the back.',
     location: 'MB-102',
     contactInfo: 'Turned over to guard',
+    email: 'security@dlsl.edu.ph',
+    photoUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=300&fit=crop',
     status: 'open',
     date: new Date()
   },
@@ -40,11 +42,37 @@ let lostAndFoundStore: LostItem[] = [
     id: '2',
     type: 'lost',
     itemName: 'Calculus Textbook',
-    description: 'Hardcover, slightly worn.',
-    location: '3rd Floor Hallway',
+    description: 'Hardcover, slightly worn. Blue cover with gold binding.',
+    location: 'MB-204',
     contactInfo: 'student@dlsl.edu.ph',
+    email: 'student@dlsl.edu.ph',
+    photoUrl: 'https://images.unsplash.com/photo-1507842772006-525ea39dd298?w=400&h=300&fit=crop',
     status: 'open',
     date: new Date(Date.now() - 86400000)
+  },
+  {
+    id: '3',
+    type: 'found',
+    itemName: 'Black Leather Wallet',
+    description: 'Found near the main entrance. Contains ID but no cash.',
+    location: 'MB-101',
+    contactInfo: 'Front Desk',
+    email: 'frontdesk@dlsl.edu.ph',
+    photoUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=300&fit=crop',
+    status: 'open',
+    date: new Date(Date.now() - 172800000)
+  },
+  {
+    id: '4',
+    type: 'lost',
+    itemName: 'Purple USB Drive',
+    description: 'Has important thesis files. Lab project data.',
+    location: 'MB-310',
+    contactInfo: 'jane.doe@dlsl.edu.ph',
+    email: 'jane.doe@dlsl.edu.ph',
+    photoUrl: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400&h=300&fit=crop',
+    status: 'open',
+    date: new Date(Date.now() - 259200000)
   }
 ];
 

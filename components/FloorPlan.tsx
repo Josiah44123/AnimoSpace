@@ -1,5 +1,5 @@
 import React from 'react';
-import { Room, UserRole } from '../types';
+import { Room, UserRole, MaintenanceRequest } from '../types';
 
 interface FloorPlanProps {
   floor: { floorNumber: number; rooms: Room[] };
@@ -7,30 +7,32 @@ interface FloorPlanProps {
   selectedRoom: Room | null;
   viewMode: 'room-booking' | 'maintenance' | 'lost-found';
   userRole: UserRole;
+  maintenanceRequests?: MaintenanceRequest[];
 }
 
 
-const getStatusStyles = (room: Room, viewMode: 'room-booking' | 'maintenance' | 'lost-found') => {
-  // Room Booking view shows availability
+const getStatusStyles = (room: Room, viewMode: 'room-booking' | 'maintenance' | 'lost-found', hasMaintenanceReport?: boolean) => {
+  // Room Booking view - show if booked (red) or available (green)
   if (viewMode === 'room-booking') {
     switch (room.computedStatus) {
       case 'occupied':
-        return 'bg-red-500 border-red-600 text-white hover:bg-red-600 shadow-red-200 cursor-pointer';
       case 'reserved':
-        return 'bg-yellow-400 border-yellow-500 text-yellow-900 hover:bg-yellow-500 shadow-yellow-200 cursor-pointer';
+        return 'bg-red-500 border-red-600 text-white hover:bg-red-600 shadow-red-200 cursor-pointer';
       case 'free':
-        return 'bg-emerald-400 border-emerald-500 text-white hover:bg-emerald-500 shadow-emerald-200 cursor-pointer';
+        return 'bg-green-500 border-green-600 text-white hover:bg-green-500 shadow-green-200 cursor-pointer';
       default:
-        return 'bg-gray-200 border-gray-300 text-gray-500 cursor-pointer';
+        return 'bg-green-500 border-green-600 text-white hover:bg-green-500 shadow-green-200 cursor-pointer';
     }
   }
-  // Maintenance view shows maintenance status
+  // Maintenance view - orange if report exists, green otherwise
   else if (viewMode === 'maintenance') {
-    return 'bg-orange-500 border-orange-600 text-white hover:bg-orange-600 shadow-orange-200 cursor-pointer';
+    return hasMaintenanceReport 
+      ? 'bg-orange-500 border-orange-600 text-white hover:bg-orange-600 shadow-orange-200 cursor-pointer'
+      : 'bg-green-500 border-green-600 text-white hover:bg-green-500 shadow-green-200 cursor-pointer';
   }
-  // Lost & Found view
+  // Lost & Found view - always green
   else {
-    return 'bg-purple-500 border-purple-600 text-white hover:bg-purple-600 shadow-purple-200 cursor-pointer';
+    return 'bg-green-500 border-green-600 text-white hover:bg-green-500 shadow-green-200 cursor-pointer';
   }
 };
 
@@ -44,11 +46,12 @@ interface RoomCardProps {
   customName?: string;
   viewMode: 'room-booking' | 'maintenance' | 'lost-found';
   isSelected?: boolean;
+  hasMaintenanceReport?: boolean;
 }
 
-const RoomCard: React.FC<RoomCardProps> = ({ room, onClick, variant = 'student', customName, viewMode, isSelected }) => {
+const RoomCard: React.FC<RoomCardProps> = ({ room, onClick, variant = 'student', customName, viewMode, isSelected, hasMaintenanceReport }) => {
   const isOffice = variant === 'office';
-  const styles = isOffice ? OFFICE_STYLE : getStatusStyles(room, viewMode);
+  const styles = isOffice ? OFFICE_STYLE : getStatusStyles(room, viewMode, hasMaintenanceReport);
 
   return (
     <div
@@ -90,7 +93,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onClick, variant = 'student',
   );
 };
 
-const FloorPlan: React.FC<FloorPlanProps> = ({ floor, onRoomClick, selectedRoom, viewMode, userRole }) => {
+const FloorPlan: React.FC<FloorPlanProps> = ({ floor, onRoomClick, selectedRoom, viewMode, userRole, maintenanceRequests = [] }) => {
   const { floorNumber, rooms } = floor;
 
   const topRoom = rooms.length > 0 ? rooms[0] : null;
@@ -100,6 +103,11 @@ const FloorPlan: React.FC<FloorPlanProps> = ({ floor, onRoomClick, selectedRoom,
   const halfPoint = Math.ceil(middleRooms.length / 2);
   const leftWing = middleRooms.slice(0, halfPoint);
   const rightWing = middleRooms.slice(halfPoint);
+
+  // Helper to check if a room has an open maintenance report
+  const hasMaintenanceReport = (roomId: string): boolean => {
+    return maintenanceRequests.some(req => req.roomId === roomId && req.status !== 'resolved');
+  };
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -132,6 +140,7 @@ const FloorPlan: React.FC<FloorPlanProps> = ({ floor, onRoomClick, selectedRoom,
                             variant="student"
                             viewMode={viewMode}
                             isSelected={selectedRoom?.id === room.id}
+                            hasMaintenanceReport={hasMaintenanceReport(room.id)}
                         />
                     ))}
                 </div>
@@ -151,6 +160,7 @@ const FloorPlan: React.FC<FloorPlanProps> = ({ floor, onRoomClick, selectedRoom,
                             variant="student"
                             viewMode={viewMode}
                             isSelected={selectedRoom?.id === room.id}
+                            hasMaintenanceReport={hasMaintenanceReport(room.id)}
                         />
                     ))}
                 </div>
