@@ -52,6 +52,28 @@ const FloorView: React.FC<FloorViewProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Floor Navigation */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">Select Floor</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+          {[1, 2, 3, 4, 5, 6].map(floor => (
+            <motion.button
+              key={floor}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onFloorChange(floor)}
+              className={`py-3 px-2 rounded-lg font-semibold text-sm transition-all ${
+                currentFloor === floor
+                  ? 'bg-green-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+              }`}
+            >
+              Level {floor}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
       {/* View Mode Tabs */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">View Mode</h3>

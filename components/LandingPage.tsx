@@ -66,15 +66,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200">
             <div>
-              <div className="text-2xl font-bold text-green-600">4+</div>
+              <div className="text-2xl font-bold text-green-600">6</div>
               <p className="text-sm text-gray-600">Building Floors</p>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-600">50+</div>
-              <p className="text-sm text-gray-600">Facilities Tracked</p>
+              <div className="text-2xl font-bold text-green-600">72</div>
+              <p className="text-sm text-gray-600">Classrooms & Labs</p>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-600">1K+</div>
+              <div className="text-2xl font-bold text-green-600">2.5K+</div>
               <p className="text-sm text-gray-600">Active Users</p>
             </div>
           </div>
