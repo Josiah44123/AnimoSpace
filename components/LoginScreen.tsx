@@ -125,7 +125,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000012_1px,transparent_1px),linear-gradient(to_bottom,#00000012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white border border-gray-200 p-10 rounded-2xl shadow-lg max-w-2xl w-full relative z-10"
@@ -141,7 +141,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
               const Icon = config.icon;
               const colors = colorMap[config.color];
               const textColor = textColorMap[config.color];
-              
+
               return (
                 <motion.button
                   key={config.role}
@@ -166,7 +166,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
 
         {/* Student Form */}
         {selectedRole === 'user' && (
-          <motion.form 
+          <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             onSubmit={handleLogin}
@@ -228,7 +228,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
 
         {/* Password Input for Protected Roles */}
         {selectedRole && selectedRole !== 'user' && (
-          <motion.form 
+          <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             onSubmit={handleLogin}
@@ -282,8 +282,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
         )}
 
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-          <button 
-            onClick={onBack} 
+          <button
+            onClick={onBack}
             className="text-gray-600 hover:text-gray-900 text-sm font-medium hover:underline transition-colors"
           >
             Return to Landing Page
