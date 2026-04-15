@@ -27,13 +27,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
     e.preventDefault();
     if (!selectedRole) return;
 
-    // Student login - requires student number (10 digits)
     if (selectedRole === 'user') {
       if (!studentNumber.trim()) {
         setError('Please enter your student number');
         return;
       }
-      // Regex: exactly 10 digits
       const studentNumberRegex = /^\d{10}$/;
       if (!studentNumberRegex.test(studentNumber.trim())) {
         setError('Student number must be exactly 10 digits');
@@ -49,7 +47,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
       return;
     }
 
-    // Admin/Staff login - requires password
     const passwords: Record<Exclude<UserRole, 'user'>, string> = {
       admin: 'admin123',
       maintenance: 'maint123',
@@ -57,7 +54,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
       sdfo: 'sdfo123'
     };
 
-    if (password === passwords[selectedRole]) {
+    const currentRole = selectedRole as Exclude<UserRole, 'user'>;
+
+    if (password === passwords[currentRole]) {
       onLogin(selectedRole);
     } else {
       setError(`Invalid ${selectedRole} password`);
@@ -120,7 +119,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000012_1px,transparent_1px),linear-gradient(to_bottom,#00000012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
       </div>
@@ -128,7 +126,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white border border-gray-200 p-10 rounded-2xl shadow-lg max-w-2xl w-full relative z-10"
+        {/* FIX: Changed max-w-2xl to max-w-5xl to fit 5 columns without overlap */}
+        className="bg-white border border-gray-200 p-10 rounded-2xl shadow-lg max-w-5xl w-full relative z-10"
       >
         <div className="text-center mb-10">
           <h2 className="text-4xl font-bold text-gray-900 mb-3">Welcome to AnimoSpace</h2>
@@ -148,29 +147,32 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleRoleSelect(config.role)}
-                  className={`flex flex-col items-start gap-3 p-5 rounded-xl border-2 transition-all text-left group ${colors.border} ${colors.hover} ${colors.bg}`}
+                  {/* FIX: Added h-full so cards are equal height */}
+                  className={`flex flex-col h-full items-start gap-3 p-5 rounded-xl border-2 transition-all text-left group ${colors.border} ${colors.hover} ${colors.bg}`}
                 >
                   <div className={`p-3 rounded-lg ${colors.bg} group-hover:scale-110 transition-transform`}>
                     <Icon className={`w-6 h-6 ${textColor}`} />
                   </div>
-                  <div>
-                    <h3 className={`font-bold ${textColor}`}>{config.label}</h3>
+                  {/* FIX: Added flex-1 so the arrow is pushed to the bottom of the card */}
+                  <div className="flex-1">
+                    <h3 className={`font-bold ${textColor} break-words`}>{config.label}</h3>
                     <p className="text-sm text-gray-600 mt-1">{config.desc}</p>
                   </div>
-                  <ArrowRight className={`w-5 h-5 ${textColor} ml-auto mt-2 group-hover:translate-x-1 transition-transform`} />
+                  {/* FIX: Changed ml-auto mt-2 to mt-auto to align arrows at the bottom */}
+                  <ArrowRight className={`w-5 h-5 ${textColor} mt-auto group-hover:translate-x-1 transition-transform`} />
                 </motion.button>
               );
             })}
           </div>
         ) : null}
 
-        {/* Student Form */}
+        {/* --- STUDENT FORM --- */}
         {selectedRole === 'user' && (
           <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             onSubmit={handleLogin}
-            className="mt-8 space-y-6"
+            className="mt-8 space-y-6 max-w-md mx-auto" /* Restricted width for form readability */
           >
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 bg-green-50">
@@ -226,13 +228,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
           </motion.form>
         )}
 
-        {/* Password Input for Protected Roles */}
+        {/* --- PASSWORD FORM FOR PROTECTED ROLES --- */}
         {selectedRole && selectedRole !== 'user' && (
           <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             onSubmit={handleLogin}
-            className="mt-8 space-y-6"
+            className="mt-8 space-y-6 max-w-md mx-auto" /* Restricted width for form readability */
           >
             <div className="text-center">
               <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 ${colorMap[roleConfig.find(r => r.role === selectedRole)?.color || 'green'].bg}`}>
@@ -260,7 +262,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
                   autoFocus
                 />
               </div>
-              {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+              {error && <p className="text-red-600 text-sm mt-2 text-center">{error}</p>}
             </div>
 
             <div className="flex gap-3">
