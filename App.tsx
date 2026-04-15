@@ -245,7 +245,7 @@ const App: React.FC = () => {
             </div>
         )}
 
-        {/* Dynamic Content Based on View */}
+        {/* Dynamic Content Based on View with Role-Based Access Control */}
         {currentView === 'dashboard' ? (
              loading ? (
                 <div className="flex flex-col items-center justify-center h-[60vh] text-gray-400">
@@ -265,16 +265,36 @@ const App: React.FC = () => {
                  maintenanceRequests={maintenanceRequests}
                />
              )
-        ) : currentView === 'lost-found' ? (
+        ) : currentView === 'lost-found' && (userRole === 'sdfo' || userRole === 'user') ? (
             <LostAndFound userRole={userRole} />
-        ) : currentView === 'maintenance' ? (
+        ) : currentView === 'maintenance' && (userRole === 'maintenance' || userRole === 'user') ? (
             <MaintenanceRequests userRole={userRole} />
-        ) : currentView === 'my-activity' ? (
+        ) : currentView === 'my-activity' && userRole === 'user' ? (
             <UserDashboard />
-        ) : currentView === 'equipment' ? (
+        ) : currentView === 'equipment' && (userRole === 'lab-officer' || userRole === 'user') ? (
             <EquipmentManagement userRole={userRole} />
-        ) : (
+        ) : currentView === 'analytics' && userRole === 'admin' ? (
             <AnalyticsDashboard />
+        ) : (
+            // Default: redirect to dashboard if trying to access unauthorized view
+            loading ? (
+                <div className="flex flex-col items-center justify-center h-[60vh] text-gray-400">
+                   <div className="w-12 h-12 border-4 border-green-200 border-t-green-500 rounded-full animate-spin mb-4"></div>
+                   <p>Syncing digital twin data...</p>
+                </div>
+             ) : (
+               <FloorView 
+                 currentFloor={currentFloor}
+                 onFloorChange={setCurrentFloor}
+                 floors={floors}
+                 selectedRoom={selectedRoom}
+                 onRoomClick={handleRoomClick}
+                 userRole={userRole}
+                 viewMode={floorViewMode}
+                 onViewModeChange={setFloorViewMode}
+                 maintenanceRequests={maintenanceRequests}
+               />
+             )
         )}
 
         {/* Room Modal */}

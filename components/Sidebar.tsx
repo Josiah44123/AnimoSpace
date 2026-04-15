@@ -67,8 +67,9 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-6 px-4">
         
-        {/* Main Views */}
+        {/* Main Views - Role Based Access */}
         <div className="mb-8 space-y-2">
+             {/* Dashboard - Available to all */}
              <button
               onClick={() => onViewChange('dashboard')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
@@ -81,20 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <span>Dashboard</span>
             </button>
             
-            {userRole !== 'user' && (
-                <button
-                onClick={() => onViewChange('analytics')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    currentView === 'analytics'
-                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-                >
-                <ClipboardList className="w-5 h-5" />
-                <span>Reports</span>
-                </button>
-            )}
-
+            {/* My Activity - Students/Faculty Only */}
             {userRole === 'user' && (
                 <button
                 onClick={() => onViewChange('my-activity')}
@@ -109,42 +97,64 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
             )}
 
-            <button
-              onClick={() => onViewChange('equipment')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                currentView === 'equipment'
-                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Package className="w-5 h-5" />
-              <span>Lab Equipment</span>
-            </button>
+            {/* Lab Equipment - Lab Officer and Students Only */}
+            {(userRole === 'lab-officer' || userRole === 'user') && (
+              <button
+                onClick={() => onViewChange('equipment')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  currentView === 'equipment'
+                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <Package className="w-5 h-5" />
+                <span>Lab Equipment</span>
+              </button>
+            )}
 
-            <button
-              onClick={() => onViewChange('maintenance')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                currentView === 'maintenance'
-                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Wrench className="w-5 h-5" />
-              <span>Maintenance</span>
-            </button>
+            {/* Maintenance - Maintenance Staff and Students/Faculty Only */}
+            {(userRole === 'maintenance' || userRole === 'user') && (
+              <button
+                onClick={() => onViewChange('maintenance')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  currentView === 'maintenance'
+                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <Wrench className="w-5 h-5" />
+                <span>Maintenance</span>
+              </button>
+            )}
 
-            {userRole !== 'maintenance' && (
-             <button
-              onClick={() => onViewChange('lost-found')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                currentView === 'lost-found'
-                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Search className="w-5 h-5" />
-              <span>Lost & Found</span>
-            </button>
+            {/* Lost & Found - SDFO and Students/Faculty Only */}
+            {(userRole === 'sdfo' || userRole === 'user') && (
+              <button
+                onClick={() => onViewChange('lost-found')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  currentView === 'lost-found'
+                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <Search className="w-5 h-5" />
+                <span>Lost & Found</span>
+              </button>
+            )}
+
+            {/* Analytics/Reports - Admin Only */}
+            {userRole === 'admin' && (
+              <button
+                onClick={() => onViewChange('analytics')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  currentView === 'analytics'
+                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <ClipboardList className="w-5 h-5" />
+                <span>Analytics</span>
+              </button>
             )}
         </div>
 
