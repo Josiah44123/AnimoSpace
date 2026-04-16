@@ -69,18 +69,35 @@ const Sidebar: React.FC<SidebarProps> = ({
         
         {/* Main Views - Role Based Access */}
         <div className="mb-8 space-y-2">
-             {/* Dashboard - Available to all */}
-             <button
-              onClick={() => onViewChange('dashboard')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                currentView === 'dashboard'
-                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <LayoutGrid className="w-5 h-5" />
-              <span>Dashboard</span>
-            </button>
+             {/* Floor Plan - Maintenance Staff Only */}
+             {userRole === 'maintenance' && (
+              <button
+                onClick={() => onViewChange('dashboard')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  currentView === 'dashboard'
+                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <LayoutGrid className="w-5 h-5" />
+                <span>Floor Plan</span>
+              </button>
+             )}
+
+             {/* Dashboard - All users except maintenance */}
+             {userRole !== 'maintenance' && (
+              <button
+                onClick={() => onViewChange('dashboard')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  currentView === 'dashboard'
+                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <LayoutGrid className="w-5 h-5" />
+                <span>Dashboard</span>
+              </button>
+             )}
             
             {/* My Activity - Students/Faculty Only */}
             {userRole === 'user' && (

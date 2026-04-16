@@ -9,26 +9,31 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
+  const [userType, setUserType] = useState<'student' | 'staff' | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [password, setPassword] = useState('');
   const [studentNumber, setStudentNumber] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
 
+  const staffRoles = [
+    { role: 'maintenance' as UserRole, label: 'Maintenance Staff' },
+    { role: 'lab-officer' as UserRole, label: 'Lab Officer' },
+    { role: 'sdfo' as UserRole, label: 'SDFO' },
+    { role: 'admin' as UserRole, label: 'Administrator' }
+  ];
+
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
     setError('');
     setPassword('');
-    setStudentNumber('');
-    setEmail('');
   };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRole) return;
 
     // Student login - requires student number (10 digits)
-    if (selectedRole === 'user') {
+    if (userType === 'student') {
       if (!studentNumber.trim()) {
         setError('Please enter your student number');
         return;
@@ -49,7 +54,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
       return;
     }
 
-    // Admin/Staff login - requires password
+    // Staff login - requires role selection and password
+    if (!selectedRole) {
+      setError('Please select a staff role');
+      return;
+    }
+
     const passwords: Record<Exclude<UserRole, 'user'>, string> = {
       admin: 'admin123',
       maintenance: 'maint123',
@@ -64,59 +74,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
     }
   };
 
-  const roleConfig = [
-    {
-      role: 'user' as UserRole,
-      label: 'Student / Faculty',
-      desc: 'Access rooms, book labs, request equipment',
-      icon: User,
-      color: 'green'
-    },
-    {
-      role: 'maintenance' as UserRole,
-      label: 'Maintenance Staff',
-      desc: 'Manage tickets and facility repairs',
-      icon: Wrench,
-      color: 'orange'
-    },
-    {
-      role: 'lab-officer' as UserRole,
-      label: 'Lab Officer',
-      desc: 'Manage equipment and lab resources',
-      icon: Key,
-      color: 'purple'
-    },
-    {
-      role: 'sdfo' as UserRole,
-      label: 'SDFO',
-      desc: 'Special Duty Facilities Officer oversight',
-      icon: Users,
-      color: 'amber'
-    },
-    {
-      role: 'admin' as UserRole,
-      label: 'Administrator',
-      desc: 'Full system control and analytics',
-      icon: ShieldCheck,
-      color: 'blue'
-    }
-  ];
 
-  const colorMap: Record<string, { bg: string; border: string; ring: string; hover: string }> = {
-    green: { bg: 'bg-green-50', border: 'border-green-200', ring: 'ring-green-400', hover: 'hover:border-green-400 hover:bg-green-50' },
-    orange: { bg: 'bg-orange-50', border: 'border-orange-200', ring: 'ring-orange-400', hover: 'hover:border-orange-400 hover:bg-orange-50' },
-    blue: { bg: 'bg-blue-50', border: 'border-blue-200', ring: 'ring-blue-400', hover: 'hover:border-blue-400 hover:bg-blue-50' },
-    purple: { bg: 'bg-purple-50', border: 'border-purple-200', ring: 'ring-purple-400', hover: 'hover:border-purple-400 hover:bg-purple-50' },
-    amber: { bg: 'bg-amber-50', border: 'border-amber-200', ring: 'ring-amber-400', hover: 'hover:border-amber-400 hover:bg-amber-50' }
-  };
-
-  const textColorMap: Record<string, string> = {
-    green: 'text-green-700',
-    orange: 'text-orange-700',
-    blue: 'text-blue-700',
-    purple: 'text-purple-700',
-    amber: 'text-amber-700'
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 relative overflow-hidden">
@@ -135,36 +93,48 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
           <p className="text-lg text-gray-600">Select your user type to access the platform</p>
         </div>
 
-        {!selectedRole ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {roleConfig.map((config) => {
-              const Icon = config.icon;
-              const colors = colorMap[config.color];
-              const textColor = textColorMap[config.color];
+        {!userType ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Student/Lasallian Partner Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setUserType('student')}
+                className="flex flex-col items-center gap-4 p-8 rounded-2xl border-2 border-green-200 bg-green-50 hover:bg-green-100 transition-all group h-full"
+              >
+                <div className="p-3 rounded-full bg-green-600 group-hover:scale-110 transition-transform">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-green-700">Student / Lasallian Partner</h3>
+                  <p className="text-sm text-gray-600 mt-2">Access rooms, book labs, request equipment</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-green-600 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
 
-              return (
-                <motion.button
-                  key={config.role}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleRoleSelect(config.role)}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all text-center group h-full justify-center ${colors.border} ${colors.hover} ${colors.bg}`}
-                >
-                  <div className={`p-2 rounded-lg ${colors.bg} group-hover:scale-110 transition-transform`}>
-                    <Icon className={`w-5 h-5 ${textColor}`} />
-                  </div>
-                  <div>
-                    <h3 className={`font-semibold text-sm ${textColor}`}>{config.label}</h3>
-                    <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{config.desc}</p>
-                  </div>
-                </motion.button>
-              );
-            })}
+              {/* Staff Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setUserType('staff')}
+                className="flex flex-col items-center gap-4 p-8 rounded-2xl border-2 border-orange-200 bg-orange-50 hover:bg-orange-100 transition-all group h-full"
+              >
+                <div className="p-3 rounded-full bg-orange-600 group-hover:scale-110 transition-transform">
+                  <ShieldCheck className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-orange-700">Staff</h3>
+                  <p className="text-sm text-gray-600 mt-2">Select your role to continue</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-orange-600 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </div>
           </div>
         ) : null}
 
         {/* Student Form */}
-        {selectedRole === 'user' && (
+        {userType === 'student' && (
           <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -210,7 +180,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setSelectedRole(null)}
+                onClick={() => {
+                  setUserType(null);
+                  setEmail('');
+                  setStudentNumber('');
+                }}
                 className="flex-1 py-3 px-4 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Back
@@ -225,8 +199,81 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack }) => {
           </motion.form>
         )}
 
-        {/* Password Input for Protected Roles */}
-        {selectedRole && selectedRole !== 'user' && (
+        {/* Staff Form with Role Dropdown */}
+        {userType === 'staff' && (
+          <motion.form 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onSubmit={handleLogin}
+            className="mt-8 space-y-6"
+          >
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 bg-orange-50">
+                <ShieldCheck className="w-8 h-8 text-orange-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">Staff Login</h3>
+              <p className="text-gray-600 mt-1">Select your role and enter password</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Staff Role *</label>
+                <select
+                  value={selectedRole || ''}
+                  onChange={(e) => handleRoleSelect(e.target.value as UserRole)}
+                  className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                >
+                  <option value="">-- Select a role --</option>
+                  {staffRoles.map(role => (
+                    <option key={role.role} value={role.role}>
+                      {role.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    className="w-full bg-white border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    autoFocus
+                  />
+                </div>
+                {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setUserType(null);
+                  setSelectedRole(null);
+                  setPassword('');
+                  setError('');
+                }}
+                className="flex-1 py-3 px-4 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                className="flex-1 py-3 px-4 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-semibold transition-colors shadow-md hover:shadow-lg"
+              >
+                Login
+              </button>
+            </div>
+          </motion.form>
+        )}
+
+        {/* Old Password Input for Protected Roles - REMOVED, handled by staff form above */}
+        {false && (
           <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

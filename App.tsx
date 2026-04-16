@@ -246,7 +246,7 @@ const App: React.FC = () => {
         )}
 
         {/* Dynamic Content Based on View with Role-Based Access Control */}
-        {currentView === 'dashboard' ? (
+        {currentView === 'dashboard' && userRole === 'maintenance' ? (
              loading ? (
                 <div className="flex flex-col items-center justify-center h-[60vh] text-gray-400">
                    <div className="w-12 h-12 border-4 border-green-200 border-t-green-500 rounded-full animate-spin mb-4"></div>

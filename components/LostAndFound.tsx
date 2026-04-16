@@ -264,13 +264,33 @@ const LostAndFound: React.FC<LostAndFoundProps> = ({ userRole }) => {
                           <p className="text-sm font-medium text-gray-800">{item.contactInfo}</p>
                       </div>
 
-                      {userRole === 'admin' && item.status === 'open' && (
-                          <button 
-                            onClick={() => handleResolve(item.id)}
-                            className="mt-4 w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors"
-                          >
-                              Mark as Resolved
-                          </button>
+                      {item.status === 'open' && (
+                          <div className="mt-4 space-y-2">
+                              {item.type === 'found' && userRole === 'user' && (
+                                  <button 
+                                    onClick={() => {
+                                      const claimData = {
+                                        itemId: item.id,
+                                        studentEmail: email,
+                                        claimedAt: new Date()
+                                      };
+                                      alert(`Claim submitted for "${item.itemName}". You will be contacted at ${email || 'your registered email'}`);
+                                      handleResolve(item.id);
+                                    }}
+                                    className="w-full py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                                  >
+                                      Claim This Item
+                                  </button>
+                              )}
+                              {userRole === 'admin' && (
+                                  <button 
+                                    onClick={() => handleResolve(item.id)}
+                                    className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors"
+                                  >
+                                      Mark as Resolved
+                                  </button>
+                              )}
+                          </div>
                       )}
                       </div>
                   </div>
