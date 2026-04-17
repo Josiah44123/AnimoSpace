@@ -1,5 +1,5 @@
-import React from 'react';
-import { Layers, User, Shield, Building, Search, LayoutGrid, Wrench, Activity, HardHat, ClipboardList, Package, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Layers, User, Shield, Building, Search, LayoutGrid, Wrench, Activity, HardHat, ClipboardList, Package, X, ChevronDown } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface SidebarProps {
@@ -24,6 +24,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   onClose
 }) => {
   const floors = [1, 2, 3, 4, 5, 6];
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+
+  const toggleMenu = (menuName: string) => {
+    setExpandedMenu(expandedMenu === menuName ? null : menuName);
+  };
 
   return (
     <>
@@ -67,70 +72,231 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-6 px-4">
         
-        {/* Main Views - Role Based Access */}
-        <div className="mb-8 space-y-2">
-             {/* Floor Plan - Maintenance Staff Only */}
-             {userRole === 'maintenance' && (
-              <button
-                onClick={() => onViewChange('dashboard')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  currentView === 'dashboard'
-                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <LayoutGrid className="w-5 h-5" />
-                <span>Floor Plan</span>
-              </button>
-             )}
+        {/* ADMIN / STANDARD USER ROLE (Students/Faculty) */}
+        {(userRole === 'admin' || userRole === 'user') && (
+          <div className="mb-8 space-y-1">
+            {/* Dashboard - Active by default */}
+            <button
+              onClick={() => onViewChange('dashboard')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                currentView === 'dashboard'
+                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <LayoutGrid className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
 
-             {/* Dashboard - All users except maintenance */}
-             {userRole !== 'maintenance' && (
+            {/* Lost & Found - Collapsible */}
+            <div>
               <button
-                onClick={() => onViewChange('dashboard')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  currentView === 'dashboard'
+                onClick={() => toggleMenu('lostFound')}
+                className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  expandedMenu === 'lostFound' || currentView === 'lost-found'
                     ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                <LayoutGrid className="w-5 h-5" />
-                <span>Dashboard</span>
+                <div className="flex items-center gap-3">
+                  <Search className="w-5 h-5" />
+                  <span>Lost & Found</span>
+                </div>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedMenu === 'lostFound' ? 'rotate-180' : ''}`} />
               </button>
-             )}
-            
-            {/* My Activity - Students/Faculty Only */}
+              {expandedMenu === 'lostFound' && (
+                <div className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">
+                  <button
+                    onClick={() => onViewChange('lost-found')}
+                    className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                      currentView === 'lost-found'
+                        ? 'bg-green-50 text-green-700 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <span>Item Gallery</span>
+                  </button>
+                  <button
+                    onClick={() => onViewChange('lost-found')}
+                    className="w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <span>Claim Tickets</span>
+                  </button>
+                  <button
+                    onClick={() => onViewChange('lost-found')}
+                    className="w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <span>Report Tickets</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Laboratory Equipment - Collapsible */}
             {userRole === 'user' && (
+              <div>
                 <button
-                onClick={() => onViewChange('my-activity')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    currentView === 'my-activity'
-                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                  onClick={() => toggleMenu('labEquipment')}
+                  className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    expandedMenu === 'labEquipment' || currentView === 'equipment'
+                      ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
                 >
-                <User className="w-5 h-5" />
-                <span>My Activity</span>
+                  <div className="flex items-center gap-3">
+                    <Package className="w-5 h-5" />
+                    <span>Laboratory Equipment</span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedMenu === 'labEquipment' ? 'rotate-180' : ''}`} />
                 </button>
+                {expandedMenu === 'labEquipment' && (
+                  <div className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">
+                    <button
+                      onClick={() => onViewChange('equipment')}
+                      className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                        currentView === 'equipment'
+                          ? 'bg-green-50 text-green-700 font-medium'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <span>Booking Calendar</span>
+                    </button>
+                    <button
+                      onClick={() => onViewChange('equipment')}
+                      className="w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <span>Borrowing Slips</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
 
-            {/* Lab Equipment - Lab Officer and Students Only */}
-            {(userRole === 'lab-officer' || userRole === 'user') && (
+            {/* Maintenance - Collapsible */}
+            {userRole === 'user' && (
+              <div>
+                <button
+                  onClick={() => toggleMenu('maintenance')}
+                  className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    expandedMenu === 'maintenance' || currentView === 'maintenance'
+                      ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Wrench className="w-5 h-5" />
+                    <span>Maintenance</span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedMenu === 'maintenance' ? 'rotate-180' : ''}`} />
+                </button>
+                {expandedMenu === 'maintenance' && (
+                  <div className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">
+                    <button
+                      onClick={() => onViewChange('maintenance')}
+                      className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                        currentView === 'maintenance'
+                          ? 'bg-green-50 text-green-700 font-medium'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <span>View Requests</span>
+                    </button>
+                    <button
+                      onClick={() => onViewChange('maintenance')}
+                      className="w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <span>Submit Report</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SDFO OFFICER ROLE */}
+        {userRole === 'sdfo' && (
+          <div className="mb-8 space-y-1">
+            <button
+              onClick={() => onViewChange('dashboard')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                currentView === 'dashboard'
+                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <LayoutGrid className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => onViewChange('lost-found')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                currentView === 'lost-found'
+                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Search className="w-5 h-5" />
+              <span>Item Gallery</span>
+            </button>
+
+            <button
+              onClick={() => onViewChange('lost-found')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                currentView === 'lost-found'
+                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Activity className="w-5 h-5" />
+              <span>Claim Tickets</span>
+            </button>
+
+            <button
+              onClick={() => onViewChange('lost-found')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                currentView === 'lost-found'
+                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ClipboardList className="w-5 h-5" />
+              <span>Report Tickets</span>
+            </button>
+          </div>
+        )}
+
+        {/* MAINTENANCE STAFF & LAB PERSONNEL ROLES */}
+        {(userRole === 'maintenance' || userRole === 'lab-officer') && (
+          <div className="mb-8 space-y-1">
+            <button
+              onClick={() => onViewChange('dashboard')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                currentView === 'dashboard'
+                  ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <LayoutGrid className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+
+            {userRole === 'maintenance' && (
               <button
-                onClick={() => onViewChange('equipment')}
+                onClick={() => onViewChange('dashboard')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  currentView === 'equipment'
+                  currentView === 'dashboard'
                     ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                <Package className="w-5 h-5" />
-                <span>Lab Equipment</span>
+                <Building className="w-5 h-5" />
+                <span>Building Map</span>
               </button>
             )}
 
-            {/* Maintenance - Maintenance Staff and Students/Faculty Only */}
-            {(userRole === 'maintenance' || userRole === 'user') && (
+            {userRole === 'maintenance' && (
               <button
                 onClick={() => onViewChange('maintenance')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
@@ -140,40 +306,25 @@ const Sidebar: React.FC<SidebarProps> = ({
                 }`}
               >
                 <Wrench className="w-5 h-5" />
-                <span>Maintenance</span>
+                <span>Maintenance Reports</span>
               </button>
             )}
 
-            {/* Lost & Found - SDFO and Students/Faculty Only */}
-            {(userRole === 'sdfo' || userRole === 'user') && (
+            {userRole === 'lab-officer' && (
               <button
-                onClick={() => onViewChange('lost-found')}
+                onClick={() => onViewChange('equipment')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  currentView === 'lost-found'
+                  currentView === 'equipment'
                     ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                <Search className="w-5 h-5" />
-                <span>Lost & Found</span>
+                <Package className="w-5 h-5" />
+                <span>Equipment Management</span>
               </button>
             )}
-
-            {/* Analytics/Reports - Admin Only */}
-            {userRole === 'admin' && (
-              <button
-                onClick={() => onViewChange('analytics')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  currentView === 'analytics'
-                    ? 'bg-green-50 text-green-700 shadow-sm font-medium border border-green-100'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <ClipboardList className="w-5 h-5" />
-                <span>Analytics</span>
-              </button>
-            )}
-        </div>
+          </div>
+        )}
 
         {/* Floor Selector (Only visible in Dashboard) */}
         {currentView === 'dashboard' && (
